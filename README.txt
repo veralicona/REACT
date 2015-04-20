@@ -1,4 +1,6 @@
-Evolutionary Algorithm for Discrete Dynamical System Optimization
+Reverse Engineering with Evolutionary Computation Tools (REACT)
+
+REACT is an Evolutionary Algorithm for Discrete Dynamical Systems' Optimization
 
 === AUTHORS ===
 
