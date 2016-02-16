@@ -1,0 +1,9 @@
+Load the package JSON.m2
+
+To read a JSON file into M2,
+A = get filename;	--this gives a string
+B = parseJSON A;	--this gives a hashtable
+C = prettyPrintJSON B;	--this gives a string
+
+--the following prints to a file
+outfilenamestring << C << endl << close

@@ -1,21 +1,21 @@
-class TaskMethod
-	attr_reader :type, :id, :description, :arguments
-	def initialize(method)
-		@type=method['type']
-		@id=method['id']
-		@description=method['desription']
-		@arguments={}
-		if !method['arguments'].empty? then
-			method['arguments'].each do |arg|
-				@arguments[arg['name']]=arg['value']
-			end
-		end
+class Graph
+	attr_reader :fieldCardinality, :type, :description, :name, :version, :parameters, :variableScores
+	def initialize(model)
+		@raw_obj=model
+		@type=model['type']
+		@description=model['description']
+		@name=model['name']
+		@version=model['version']
+		@fieldCardinality=model['fieldCardinality']
+		@parameters=model['parameters']
+		@variableScores=model['variableScores']
 	end
 end
 
-class Model
+class PolynomialDynamicalSystem
 	attr_reader :fieldCardinality, :type, :description, :name, :version, :parameters, :updateRules, :variables, :variableScores, :simlab
 	def initialize(model)
+		@raw_obj=model
 		@type=model['type']
 		@description=model['description']
 		@name=model['name']
@@ -30,9 +30,10 @@ class Model
 end
 
 class TimeSeries
-	attr_reader :data
+	attr_reader :data, :raw_obj
 	def initialize(ts)
 		@data=ts['timeSeriesData']
+		@raw_obj=ts
 	end
 
 	def get_numberOfVariables()
@@ -71,24 +72,19 @@ class Task
 		@exec_file=exec_file
 		@errors=[]
 		@warnings=[]
-		@task = json['task']
-		if @task.nil? then  raise "JSON_FILE_HAS_NO_TASK" end
-		if @task['input'].nil? then  raise "TASK_HAS_NO_INPUT" end
-		if @task['method'].nil? then  raise "TASK_HAS_NO_METHOD" end
-		@method=TaskMethod.new(@task['method'])
 		@input = {
-			"models"=>{},
+			"polynomialDynamicalSystemSet"=>[],
 			"timeSeries"=>[],
-			"custom"=>[]
+			"priorReverseEngineeringNetwork"=>[]
 		}
-		@task['input'].each do |o|
+		json.each do |o|
 			case o['type'].downcase
-			when "model"
-				@input['models'][o['name']]=Model.new(o)
+			when "polynomialdynamicalsystemset"
+				@input['polynomialDynamicalSystemSet'].push(PolynomialDynamicalSystem.new(o))
 			when "timeseries"
 				@input['timeSeries'].push(TimeSeries.new(o))
-			else
-				@input['custom'].push(input)
+			when "priorreverseengineeringnetwork"
+				@input['priorReverseEngineeringNetwork'].push(Graph.new(o))
 			end
 		end
 		if !@input['timeSeries'].empty? then

@@ -16,24 +16,19 @@ More info: http://www.paola-vera-licona.net/Software/EARevEng/REACT.html
 
 ## HOW TO RUN REACT ##
 
-REACT has been made available as a Docker container to make it easy to run anywhere without tedious technical manipulation. For more information about Docker, see http://docker.com
-The REACT docker image is available here: https://registry.hub.docker.com/u/thibauld/react/
+REACT has been made available as an AlgoRun Docker container to make it easy to run anywhere without tedious technical manipulation. For more information about Docker, see http://docker.com
+The REACT docker image is available on Docker Hub as: algorun/react
 
 1. Install docker
 See https://docs.docker.com/
 
 2. Run the REACT docker image
-sudo docker run -d -p 31331:8765 --name react thibauld/react
-This will automatically pull the thibauld/react docker image from docker hub.
+sudo docker run -d -p 31331:8765 --name react algorun/react
+This will automatically pull the algorun/react docker image from docker hub.
 Note that you can pick an other port number than 31331
 
 3. Test that the REACT docker image is running correctly
-You can try to call the REACT docker container with the program api_call_test.rb located in the test directory:
-Example: ruby test/api_call_test.rb test/test1/REACT_Input_Example1.json 0.0.0.0 31331
-It should return you with an output json file
-
-4. You can also access the Algorun web interface via your web browser
-Direct your web browser to http://127.0.0.1:31331
+You can try the algorithm by navigating to http://localhost:31331 in the web browser
 
 5. [optional] to stop and delete the container
 sudo docker kill react
@@ -41,7 +36,5 @@ sudo docker rm react
 
 ## HOW TO REBUILD THE DOCKER IMAGE ##
 
-If you changed the REACT code, you need to rebuild the docker image:
-cd superADAM/REACT
+If you change the REACT code, you will need to rebuild the docker image:
 sudo docker build -t <your username>/react .
-You may also have to update the Dockerfile to reflect changes you made in the REACT docker container.

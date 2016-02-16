@@ -1,11 +1,24 @@
 #!/usr/bin/ruby
-require_relative './algorun/Task.rb'
-require_relative './algorun/React.rb'
-require_relative './algorun/Server.rb'
+require_relative 'Task.rb'
+require_relative 'React.rb'
+require_relative 'Server.rb'
 
 if ENV["CODE_HOME"].nil? then
 	ENV["CODE_HOME"]=ENV["PWD"]
 end
+
+ENV['HammingPolyWeight']="0.5"
+ENV['ComplexityWeight']="0.2"
+ENV['RevEngWeight']="0"
+ENV['BioProbWeight']="0"
+ENV['HammingModelWeight']="0.35"
+ENV['PolyScoreWeight']="0.65"
+ENV['GenePoolSize']="100"
+ENV['NumCandidates']="55"
+ENV['NumParentsToPreserve']="5"
+ENV['MaxGenerations']="100"
+ENV['StableGenerationLimit']="50"
+ENV['MutateProbability']="0.5"
 
 class String
 	# colorization
@@ -63,9 +76,9 @@ case param
 		puts "* start: start the REACT web service"
 		puts "* help: shows this help message"
 	when "make"
-		Dir.chdir ENV['CODE_HOME']+"/src"
+		Dir.chdir ENV['CODE_HOME']+"/src/"
 		system("make")
-		system("cp React ..")
+		# system("cp React ..")
 	when "test"
 		num=ARGV[1]
 		if not ["1","2","3"].include? num then

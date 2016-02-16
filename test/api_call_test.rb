@@ -46,5 +46,5 @@ end
 input = File.read(json_file)
 json = JSON.parse(input)
 uri = URI("http://"+ip+":"+port+"/do/run")
-res = Net::HTTP.post_form(uri, 'input' => input)
+res = Net::HTTP.post_form(uri, 'input' => input, :read_timeout=>60)
 puts res.body

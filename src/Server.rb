@@ -60,6 +60,7 @@ class Algorun < WEBrick::HTTPServlet::AbstractServlet
 			response.status = 404
 	end
 	response.content_type = "application/json"
+	response['Access-Control-Allow-Origin']='http://plantsimlab.local.org'
 	response.body = output+ "\n"
     end
 end

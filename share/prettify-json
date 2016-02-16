@@ -1,0 +1,53 @@
+#!/usr/bin/env M2 --script
+
+-- TO USE: export ADAM_ROOT=<location of your ADAM.private, including ADAM.private>
+-- place $(ADAM_ROOT)/share onto your shell PATH
+-- use 
+--   prettify-json input output
+--
+-- If you prefer to have it read and write from stdin, stdout, let mike stillman know.
+
+adamRoot = getenv("ADAM_ROOT")
+path = prepend(adamRoot | "/superADAM/share/", path)
+
+needsPackage "JSON"
+
+helpString = ///usage: prettify jsonfile outputfile
+
+If 'jsonfile' contains valid json, then pretty print 
+the json to 'outputfile'
+
+If not, then either a M2 error will occur, or an error message will be
+displayed to stderr, and jsonfile will NOT be copied to outputfile
+
+Caveat: the json parser doesn't handle all kinds of characters yet.
+If any problem, please let mike stillman know.
+///
+
+if #scriptCommandLine != 3 and #scriptCommandLine != 1 then (
+    stderr << helpString;
+    exit(1);
+    )
+
+if #scriptCommandLine == 3 then (
+    contents = get scriptCommandLine#1;
+    H = parseJSON contents;
+    if instance(H, ErrorPacket) then (
+        stderr << H#"error" << endl;
+        exit(2);
+    ) else (
+        F = openOut scriptCommandLine#2;
+        F << prettyPrintJSON H << close;
+        exit(0);
+    ))
+
+-- at this point, #scriptCommandLine == 1, and we need to read/write from stdin/stdout
+    contents = get stdio;
+    H = parseJSON contents;
+    if instance(H, ErrorPacket) then (
+        stderr << H#"error" << endl;
+        exit(2);
+    ) else (
+        << prettyPrintJSON H << close;
+        exit(0);
+    )

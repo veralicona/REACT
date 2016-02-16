@@ -1,0 +1,66 @@
+# recall the following variables in make:
+# $@  the target (LHS of :)
+# $<  first dependency
+# $*  the part that matches the % in a rule.
+#
+# see 'make help' for info about the targets in this Makefile.
+
+TESTS_OUT = $(addprefix ./algorun_info/, $(addsuffix -check.out, $(TESTS)))
+TESTS_CURL = $(addprefix ./algorun_info/, $(addsuffix -curl.out, $(TESTS)))
+TESTS_DIRECT = $(addprefix ./algorun_info/, $(addsuffix -direct.out, $(TESTS)))
+
+all: help
+
+build:
+	docker pull algorun/algorun
+	cp -r ../share .
+	docker build -t algorun/$(CONTAINER_NAME) .
+
+run:
+	docker run -d -p $(PORT):8765 --name $(CONTAINER_NAME) algorun/$(CONTAINER_NAME)
+
+stop:
+	docker stop $(CONTAINER_NAME)
+	docker rm $(CONTAINER_NAME)
+
+try:
+	open http://$$(docker-machine ip default):$(PORT)
+
+algorun_info/test1-input.json: algorun_info/input_example.txt
+	@cp $< $@
+	@cp algorun_info/output_example.txt algorun_info/test1-output.json
+
+check: $(TESTS_OUT)
+check-curl: $(TESTS_CURL)
+check-direct: $(TESTS_DIRECT)
+
+%-check.out : %-input.json
+	@$(COMMAND) < $< > $@
+	@diff -w -q $@ $*-output.json || echo "test $* failed"
+
+%-curl.out : %-input.json
+	@curl -F input=@$< http://$$(docker-machine ip default):$(PORT)/v1/run >$@ 2> /dev/null
+	@diff -w -q $@ $*-output.json || echo "curl $* failed: make sure you have done 'make run'"
+
+%-direct.out : %-input.json
+	@docker exec -i $(CONTAINER_NAME) /bin/algorun < $< > $@
+	@diff -w -q $@ $*-output.json || echo "direct $* failed: make sure you have done 'make run'"
+
+clean:
+	rm -rf algorun_info/*.out
+
+distclean: clean
+	rm -rf share/ algorun_info/test1*.json
+
+help:
+	@echo "make targets:"
+	@echo "  build         build the docker image"
+	@echo "  run           run a previously built image"
+	@echo "  try           start the http server on the container, calls open (for use on mac)"
+	@echo "  check         run tests, if the target can be run on the current computer"
+	@echo "  check-curl    run tests using the http server in the container.  Container must be running"
+	@echo "  check-direct  run tests using the container as command line command.  Container must be running"
+	@echo "  clean         remove all the algorun/*.out files that are created during 'check', 'check-curl', 'check-direct'"
+	@echo "  distclean     removes also copied files (e.g. share/ and algorun/test1-input.json, test1-output.json)"
+	@echo "  help          list of make targets and their description"
+

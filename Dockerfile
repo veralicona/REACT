@@ -1,20 +1,15 @@
-FROM phusion/baseimage:0.9.15
-MAINTAINER Thibauld Favre <thibauld@fastmail.com>
-RUN apt-get update
-RUN apt-get install -y ruby2.0 aptitude
-RUN aptitude -y install build-essential
+# Fill files in algorun_info folder and put your source code in src folder
+# Don't change the following three lines
+FROM algorun/algorun
+ADD ./algorun_info /home/algorithm/web/algorun_info/
+ADD ./src /home/algorithm/src/
+
+# Install any algorithm dependencies here
+RUN apt-get update && \
+apt-get install -y build-essential ruby
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-ADD run.rb /home/REACT/
-ADD ./src/*.h /home/REACT/src/
-ADD ./src/*.cpp /home/REACT/src/
-ADD ./src/Makefile /home/REACT/src/
-ADD ./algorun/*.rb /home/REACT/algorun/
-ADD ./algorun/web/index.html /home/REACT/algorun/web/
-ADD ./algorun/web/js /home/REACT/algorun/web/js/
-ADD ./algorun/web/css /home/REACT/algorun/web/css/
-RUN cd /home/REACT/
-ENV CODE_HOME /home/REACT
-RUN ["/usr/bin/ruby","/home/REACT/run.rb","make"]
+RUN ruby /home/algorithm/src/run.rb make
 RUN rm -f src/*.o
-EXPOSE 8765
-ENTRYPOINT ["/usr/bin/ruby","/home/REACT/run.rb","start"]
+
+# [Optional] Sign your image
+MAINTAINER Abdelrahman <abdelrahman.hosny@hotmail.com>
